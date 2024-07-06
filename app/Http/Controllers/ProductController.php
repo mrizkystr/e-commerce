@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Merchant; // Pastikan model Merchant diimpor
+use App\Models\Merchant;
 use App\Http\Resources\ProductResource;
-use App\Http\Resources\MerchantResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -32,7 +31,7 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'merchants_id' => 'required|integer',
+            'merchants_id' => 'required|integer', // Ubah merchants_id menjadi merchant_id
             'price' => 'required|string',
             'status' => 'required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -42,7 +41,18 @@ class ProductController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $product = Product::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $data['image'] = 'images/' . $imageName; // Simpan path relatif
+        }
+
+        $product = Product::create($data);
+
+        // Memuat relasi merchant
+        $product->load('merchant');
 
         return new ProductResource($product);
     }
@@ -72,7 +82,7 @@ class ProductController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'merchants_id' => 'sometimes|required|integer',
+            'merchants_id' => 'sometimes|required|integer', // Ubah merchants_id menjadi merchant_id
             'price' => 'sometimes|required|string',
             'status' => 'sometimes|required|in:active,inactive',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -84,7 +94,18 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return response()->json($product);
+        if ($request->hasFile('image')) {
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $data['image'] = 'images/' . $imageName; // Simpan path relatif
+        }
+
+        $product->update($data);
+
+        // Memuat relasi merchant setelah update
+        $product->load('merchant');
+
+        return new ProductResource($product);
     }
 
     /**
@@ -101,4 +122,3 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 }
-
