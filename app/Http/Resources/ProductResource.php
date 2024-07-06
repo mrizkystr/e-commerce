@@ -14,7 +14,7 @@ class ProductResource extends JsonResource
             'merchant' => $this->merchant->merchant_name,
             'price' => $this->price,
             'status' => $this->status,
-            'image' => $this->image,
+            'image_url' => asset($this->image), // Menggunakan asset() untuk path absolut dari public
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
