@@ -14,12 +14,13 @@ class CreateProductsTable extends Migration
             $table->foreignId('merchants_id')->references('id')->on('merchants');
             $table->string('price');
             $table->enum('status', ['active', 'inactive']);
+            $table->string('image'); // Menambahkan kolom image
             $table->timestamps();
         });
     }
-
+    
     public function down()
     {
         Schema::dropIfExists('products');
     }
-}
+}    
