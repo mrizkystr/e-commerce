@@ -17,8 +17,8 @@ class ProductController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'merchant_id' => 'required|integer|exists:merchants,id',
-            'price' => 'required|integer',
+            'merchants_id' => 'required|integer',
+            'price' => 'required|string',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -42,8 +42,8 @@ class ProductController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'merchant_id' => 'sometimes|required|integer|exists:merchants,id',
-            'price' => 'sometimes|required|integer',
+            'merchants_id' => 'sometimes|required|integer',
+            'price' => 'sometimes|required|string',
             'status' => 'sometimes|required|in:active,inactive',
         ]);
 

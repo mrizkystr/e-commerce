@@ -12,7 +12,7 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
-        //set validasi
+        // Validasi input
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -20,12 +20,12 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        //response error validasi
+        // Response error validasi
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        //create user
+        // Buat user baru
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
@@ -34,8 +34,19 @@ class RegisterController extends Controller
             'role' => 'user', // Set role as 'user'
         ]);
 
-        //response user created
-        return response()->json(['message' => 'User registered successfully'], 201);
+       { // Response user created dengan data pengguna
+        return response()->json([
+            'message' => 'User registered successfully',
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'no_telp' => $user->no_telp,
+                'role' => $user->role,
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+            ]
+        ], 201);
     }
 }
-
+}

@@ -11,7 +11,7 @@ class Merchant extends Model
 
     protected $table = 'merchants';
 
-    protected $fillable = ['id', 'country_code', 'merchant_name'];
+    protected $fillable = ['country_code', 'merchant_name'];
 
     public $incrementing = false;
     protected $primaryKey = ['id', 'country_code'];

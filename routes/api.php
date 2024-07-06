@@ -35,7 +35,7 @@ Route::prefix('products')->group(function () {
     Route::delete('/{id}', [ProductController::class, 'destroy']);
 });
 
-Route::prefix('ecommerce/merchants')->group(function () {
+Route::prefix('merchants')->group(function () {
     Route::get('/', [MerchantController::class, 'index']);
     Route::post('/store', [MerchantController::class, 'store']);
     Route::get('/{id}', [MerchantController::class, 'show']);
