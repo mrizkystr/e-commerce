@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\MerchantController;
-
+use App\Http\Controllers\BannerController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -42,3 +42,12 @@ Route::prefix('merchants')->group(function () {
     Route::put('/{id}', [MerchantController::class, 'update']);
     Route::delete('/{id}', [MerchantController::class, 'destroy']);
 });
+
+Route::prefix('banners')->group(function () {
+    Route::get('/', [BannerController::class, 'index']);
+    Route::get('/{id}', [BannerController::class, 'show']);
+    Route::post('/store', [BannerController::class, 'store']);
+    Route::put('/{id}', [BannerController::class, 'update']);
+    Route::delete('/{id}', [BannerController::class, 'destroy']);
+});
+
