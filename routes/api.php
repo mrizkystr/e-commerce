@@ -2,11 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BannerController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartItemController;
+use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\RegisterController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,3 +54,27 @@ Route::prefix('banners')->group(function () {
     Route::delete('/{id}', [BannerController::class, 'destroy']);
 });
 
+
+Route::prefix('orders')->group(function () {
+    Route::get('/', [OrderController::class, 'index']);
+    Route::get('/{id}', [OrderController::class, 'show']);
+    Route::post('/store', [OrderController::class, 'store']);
+    Route::put('/{id}', [OrderController::class, 'update']);
+    Route::delete('/{id}', [OrderController::class, 'destroy']);
+});
+
+Route::prefix('carts')->group(function () {
+    Route::get('/', [CartController::class, 'index']);
+    Route::get('/{id}', [CartController::class, 'show']);
+    Route::post('/store', [CartController::class, 'store']);
+    Route::put('/{id}', [CartController::class, 'update']);
+    Route::delete('/{id}', [CartController::class, 'destroy']);
+});
+
+Route::prefix('/carts-items')->group(function () {
+    Route::get('/', [CartItemController::class, 'index']);
+    Route::post('/store', [CartItemController::class, 'store']);
+    Route::get('/{id}', [CartItemController::class, 'show']);
+    Route::put('/{id}', [CartItemController::class, 'update']);
+    Route::delete('/{id}', [CartItemController::class, 'destroy']);
+});
