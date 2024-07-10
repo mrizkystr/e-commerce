@@ -8,6 +8,7 @@ use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\MerchantController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 /*
@@ -77,4 +78,12 @@ Route::prefix('/carts-items')->group(function () {
     Route::get('/{id}', [CartItemController::class, 'show']);
     Route::put('/{id}', [CartItemController::class, 'update']);
     Route::delete('/{id}', [CartItemController::class, 'destroy']);
+});
+
+Route::prefix('wishlists')->group(function () {
+    Route::get('/', [WishlistController::class, 'index'])->name('wishlists.index');
+    Route::post('/store', [WishlistController::class, 'store'])->name('wishlists.store');
+    Route::get('/{id}', [WishlistController::class, 'show'])->name('wishlists.show');
+    Route::put('/{id}', [WishlistController::class, 'update'])->name('wishlists.update');
+    Route::delete('/{id}', [WishlistController::class, 'destroy'])->name('wishlists.destroy');
 });
