@@ -5,51 +5,44 @@ namespace App\Http\Controllers;
 use App\Models\CartItem;
 use App\Http\Resources\CartItemResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class CartItemController extends Controller
 {
     public function index()
     {
-        return CartItemResource::collection(CartItem::all());
+        $cartItems = CartItem::with(['user', 'product'])->get();
+        return CartItemResource::collection($cartItems);
     }
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'carts_id' => 'required|exists:carts,id',
+        $validatedData = $request->validate([
+            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
+        $cartItem = CartItem::create($validatedData);
 
-        $cartItem = CartItem::create($request->all());
         return new CartItemResource($cartItem);
     }
 
     public function show($id)
     {
-        $cartItem = CartItem::findOrFail($id);
+        $cartItem = CartItem::with(['user', 'product'])->findOrFail($id);
         return new CartItemResource($cartItem);
     }
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'carts_id' => 'required|exists:carts,id',
+        $cartItem = CartItem::findOrFail($id);
+
+        $validatedData = $request->validate([
+            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
+        $cartItem->update($validatedData);
 
-        $cartItem = CartItem::findOrFail($id);
-        $cartItem->update($request->all());
         return new CartItemResource($cartItem);
     }
 
@@ -57,6 +50,7 @@ class CartItemController extends Controller
     {
         $cartItem = CartItem::findOrFail($id);
         $cartItem->delete();
+
         return response()->noContent();
     }
 }
