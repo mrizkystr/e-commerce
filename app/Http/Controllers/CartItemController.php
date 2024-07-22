@@ -17,9 +17,8 @@ class CartItemController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'carts_id' => 'required|exists:carts,id',
+            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -39,9 +38,8 @@ class CartItemController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'carts_id' => 'required|exists:carts,id',
+            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
