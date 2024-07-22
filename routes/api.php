@@ -62,6 +62,7 @@ Route::prefix('orders')->group(function () {
     Route::post('/store', [OrderController::class, 'store']);
     Route::put('/{id}', [OrderController::class, 'update']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+    Route::post('orders/{id}/pay', [OrderController::class, 'markAsPaid']);
 });
 
 Route::prefix('carts')->group(function () {
