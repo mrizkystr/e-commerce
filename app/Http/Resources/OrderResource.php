@@ -2,16 +2,16 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderResource extends JsonResource
 {
-    public function toArray(Request $request)
+    public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'user' => $this->user,
+            'users_id' => $this->users_id,
+            'cart_items_id' => $this->cart_items_id,
             'total_price' => $this->total_price,
             'status' => $this->status,
             'created_at' => $this->created_at,
