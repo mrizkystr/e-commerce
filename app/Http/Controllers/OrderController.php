@@ -40,9 +40,14 @@ class OrderController extends Controller
 
         // Hitung total harga dari cart items yang terkait
         $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = $cartItems->sum(function ($cartItem) {
-            return $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
-        });
+        $totalPrice = 0;
+        foreach ($cartItems as $cartItem) {
+            $price = $cartItem->product->price;
+            if (!is_numeric($price)) {
+                return response()->json(['error' => 'Non-numeric value encountered in product price.'], 400);
+            }
+            $totalPrice += $price;
+        }
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
