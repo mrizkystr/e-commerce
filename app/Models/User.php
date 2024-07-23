@@ -62,7 +62,7 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * getJWTIdentifier
-     * 
+     *
      * @return void
      */
     public function getJWTIdentifier()
@@ -72,12 +72,12 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * getJWTCustomClaims
-     * 
+     *
      * @return void
      */
     public function getJWTCustomClaims()
     {
-        return [];    
+        return [];
     }
 
     public function wishlists()
