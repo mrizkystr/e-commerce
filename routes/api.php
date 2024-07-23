@@ -11,6 +11,7 @@ use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -62,6 +63,7 @@ Route::prefix('orders')->group(function () {
     Route::post('/store', [OrderController::class, 'store']);
     Route::put('/{id}', [OrderController::class, 'update']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+    Route::post('orders/{id}/pay', [OrderController::class, 'markAsPaid']);
 });
 
 Route::prefix('carts')->group(function () {
@@ -86,4 +88,11 @@ Route::prefix('wishlists')->group(function () {
     Route::get('/{id}', [WishlistController::class, 'show'])->name('wishlists.show');
     Route::put('/{id}', [WishlistController::class, 'update'])->name('wishlists.update');
     Route::delete('/{id}', [WishlistController::class, 'destroy'])->name('wishlists.destroy');
+});
+
+Route::prefix('profiles')->middleware('auth:api')->group(function () {
+    Route::get('/', [ProfileController::class, 'show'])->name('profiles.show');
+    Route::post('/store', [ProfileController::class, 'store'])->name('profiles.store');
+    Route::put('/{id}', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profiles.destroy');
 });

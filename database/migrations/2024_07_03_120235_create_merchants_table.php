@@ -15,7 +15,7 @@ class CreateMerchantsTable extends Migration
     {
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
-            $table->integer('country_code');
+            $table->string('country_code');
             $table->string('merchant_name');
             $table->timestamps();
 
