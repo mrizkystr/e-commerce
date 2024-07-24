@@ -27,7 +27,6 @@ class OrderController extends Controller
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
-            'status' => 'in:pending,completed,canceled',
         ]);
 
         if ($validator->fails()) {
@@ -37,12 +36,15 @@ class OrderController extends Controller
         // Tambahkan users_id dari pengguna yang sedang login
         $orderData = $request->all();
         $orderData['users_id'] = auth()->id();
+        $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Hitung total harga dari cart items yang terkait
-        $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = $cartItems->sum(function ($cartItem) {
-            return $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
-        });
+        // Ambil cart item yang terkait
+        $cartItem = CartItem::where('id', $request->cart_items_id)
+                            ->where('users_id', auth()->id())
+                            ->firstOrFail();
+
+        // Hitung total harga dari cart item yang terkait
+        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
@@ -69,7 +71,6 @@ class OrderController extends Controller
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
-            'status' => 'in:pending,completed,canceled',
         ]);
 
         if ($validator->fails()) {
@@ -79,12 +80,15 @@ class OrderController extends Controller
         // Tambahkan users_id dari pengguna yang sedang login
         $orderData = $request->all();
         $orderData['users_id'] = auth()->id();
+        $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Hitung ulang total harga dari cart items yang terkait
-        $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = $cartItems->sum(function ($cartItem) {
-            return $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
-        });
+        // Ambil cart item yang terkait
+        $cartItem = CartItem::where('id', $request->cart_items_id)
+                            ->where('users_id', auth()->id())
+                            ->firstOrFail();
+
+        // Hitung ulang total harga dari cart item yang terkait
+        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
