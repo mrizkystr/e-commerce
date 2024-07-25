@@ -39,15 +39,13 @@ class OrderController extends Controller
         $orderData['users_id'] = auth()->id();
         $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Hitung total harga dari cart items yang terkait
-        $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = 0;
+        // Ambil cart item yang terkait
+        $cartItem = CartItem::where('id', $request->cart_items_id)
+                            ->where('users_id', auth()->id())
+                            ->firstOrFail();
 
-        foreach ($cartItems as $cartItem) {
-            $productPrice = (float) $cartItem->product->price;
-            Log::info("Product ID: {$cartItem->product->id}, Price: {$productPrice}");
-            $totalPrice += $productPrice;
-        }
+        // Hitung total harga dari cart item yang terkait
+        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
@@ -85,15 +83,13 @@ class OrderController extends Controller
         $orderData['users_id'] = auth()->id();
         $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Hitung ulang total harga dari cart items yang terkait
-        $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = 0;
+        // Ambil cart item yang terkait
+        $cartItem = CartItem::where('id', $request->cart_items_id)
+                            ->where('users_id', auth()->id())
+                            ->firstOrFail();
 
-        foreach ($cartItems as $cartItem) {
-            $productPrice = (float) $cartItem->product->price;
-            Log::info("Product ID: {$cartItem->product->id}, Price: {$productPrice}");
-            $totalPrice += $productPrice;
-        }
+        // Hitung ulang total harga dari cart item yang terkait
+        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
