@@ -1,17 +1,20 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,7 +33,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [LoginController::class, 'index']);
 Route::post('logout', [LoginController::class, 'logout'])->middleware('auth:api');
-
+Route::get('auth/redirect/{provider}', [SocialiteController::class, 'redirectToProvider']);
+Route::get('auth/callback/{provider}', [SocialiteController::class, 'handleProviderCallback']);
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
@@ -91,8 +95,8 @@ Route::prefix('wishlists')->group(function () {
 });
 
 Route::prefix('profiles')->middleware('auth:api')->group(function () {
-    Route::get('/', [ProfileController::class, 'show'])->name('profiles.show');
+    Route::get('/{id}', [ProfileController::class, 'show'])->name('profiles.show');
     Route::post('/store', [ProfileController::class, 'store'])->name('profiles.store');
-    Route::put('/{id}', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::put('/update', [ProfileController::class, 'update'])->name('profiles.update');
     Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profiles.destroy');
 });

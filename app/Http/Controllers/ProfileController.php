@@ -14,15 +14,18 @@ use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
-    public function show()
+    public function show($id)
     {
-        $profile = Auth::user()->profile;
-        if ($profile) {
-            return new ProfileResource($profile);
+        $user = User::with('profile')->find($id);
+
+        if ($user) {
+            return new UserProfileResource($user);
         } else {
-            return response()->json(['message' => 'Profile not found'], 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
     }
+
+
 
     public function store(Request $request)
     {

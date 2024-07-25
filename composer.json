@@ -10,6 +10,7 @@
         "kawankoding/laravel-fcm": "^0.2.9",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
+        "laravel/socialite": "^5.15",
         "laravel/tinker": "^2.8",
         "spatie/laravel-permission": "^6.9",
         "tymon/jwt-auth": "^2.1"
@@ -27,7 +28,8 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Laravel\\Socialite\\": "vendor/laravel/socialite/src/"
         }
     },
     "autoload-dev": {
