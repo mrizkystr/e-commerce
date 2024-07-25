@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->foreignId('cart_items_id')->references('id')->on('users')->onDelete('cascade');
             $table->integer('total_price'); // Mengubah menjadi string
             $table->string('status')->default('pending');
+            $table->string('transaction_status')->nullable(); // Tambahkan kolom 'transaction_status'
             $table->timestamps();
         });
     }

@@ -7,12 +7,21 @@ use App\Models\CartItem;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Midtrans\Config;
+use Midtrans\Snap;
+use Midtrans\Notification;
 
 class OrderController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:api'); // Pastikan middleware otentikasi digunakan
+
+        // Konfigurasi Midtrans
+        Config::$serverKey = config('midtrans.server_key');
+        Config::$isProduction = config('midtrans.is_production');
+        Config::$isSanitized = config('midtrans.is_sanitized');
+        Config::$is3ds = config('midtrans.is_3ds');
     }
 
     public function index()
@@ -40,8 +49,8 @@ class OrderController extends Controller
 
         // Ambil cart item yang terkait
         $cartItem = CartItem::where('id', $request->cart_items_id)
-                            ->where('users_id', auth()->id())
-                            ->firstOrFail();
+            ->where('users_id', auth()->id())
+            ->firstOrFail();
 
         // Hitung total harga dari cart item yang terkait
         $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
@@ -52,7 +61,6 @@ class OrderController extends Controller
         // Buat order baru
         $order = Order::create($orderData);
 
-        // Kembalikan response
         return new OrderResource($order);
     }
 
@@ -84,8 +92,8 @@ class OrderController extends Controller
 
         // Ambil cart item yang terkait
         $cartItem = CartItem::where('id', $request->cart_items_id)
-                            ->where('users_id', auth()->id())
-                            ->firstOrFail();
+            ->where('users_id', auth()->id())
+            ->firstOrFail();
 
         // Hitung ulang total harga dari cart item yang terkait
         $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
@@ -96,7 +104,6 @@ class OrderController extends Controller
         // Update order
         $order->update($orderData);
 
-        // Kembalikan response
         return new OrderResource($order);
     }
 
@@ -107,7 +114,48 @@ class OrderController extends Controller
         // Hapus order
         $order->delete();
 
-        // Kembalikan response tanpa konten
         return response()->noContent();
+    }
+
+    public function createPayment($id)
+    {
+        // Ambil order berdasarkan id dan pengguna yang sedang login
+        $order = Order::where('users_id', auth()->id())->findOrFail($id);
+
+        // Buat transaksi Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->id,
+                'gross_amount' => $order->total_price,
+            ],
+            'customer_details' => [
+                'first_name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+            ],
+        ];
+
+        $snapToken = Snap::getSnapToken($params);
+
+        return response()->json([
+            'order' => new OrderResource($order),
+            'snap_token' => $snapToken,
+        ]);
+    }
+
+    public function handleNotification(Request $request)
+    {
+        $notification = new Notification();
+
+        $order = Order::findOrFail($notification->order_id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $order->update([
+            'transaction_status' => $notification->transaction_status,
+        ]);
+
+        return response()->json(['message' => 'Notification handled successfully']);
     }
 }

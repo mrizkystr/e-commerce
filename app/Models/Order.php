@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\CartItem;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
@@ -15,6 +14,7 @@ class Order extends Model
         'cart_items_id',
         'total_price',
         'status',
+        'transaction_status',
     ];
 
     /**
