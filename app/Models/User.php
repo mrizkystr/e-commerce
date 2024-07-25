@@ -29,6 +29,11 @@ class User extends Authenticatable implements JWTSubject
         'no_telp',
     ];
 
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -57,7 +62,7 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * getJWTIdentifier
-     * 
+     *
      * @return void
      */
     public function getJWTIdentifier()
@@ -67,12 +72,12 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * getJWTCustomClaims
-     * 
+     *
      * @return void
      */
     public function getJWTCustomClaims()
     {
-        return [];    
+        return [];
     }
 
     public function wishlists()

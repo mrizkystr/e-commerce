@@ -37,7 +37,7 @@ class RegisterController extends Controller
        { // Response user created dengan data pengguna
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => [
+         'user' => [
                 'id' => $user->id,
                 'username' => $user->username,
                 'email' => $user->email,

@@ -19,7 +19,7 @@ class MerchantController extends Controller
     {
         // Validasi input data
         $validator = Validator::make($request->all(), [
-            'country_code' => 'required|integer',
+            'country_code' => 'required|string',
             'merchant_name' => 'required|string|max:255',
         ]);
 
@@ -49,7 +49,7 @@ class MerchantController extends Controller
 
         // Validasi input data
         $validator = Validator::make($request->all(), [
-            'country_code' => 'sometimes|required|integer',
+            'country_code' => 'sometimes|required|string',
             'merchant_name' => 'sometimes|required|string|max:255',
         ]);
 
@@ -70,11 +70,13 @@ class MerchantController extends Controller
     {
         // Cari data merchant berdasarkan ID
         $merchant = Merchant::findOrFail($id);
-        
+
         // Hapus data merchant
         $merchant->delete();
 
         // Kembalikan respon tanpa konten
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Deleted From Merchant',
+        ], 200);
     }
 }

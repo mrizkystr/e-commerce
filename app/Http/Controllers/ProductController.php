@@ -44,7 +44,7 @@ class ProductController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();  
+            $imageName = time().'.'.$request->image->extension();
             $request->image->move(public_path('images'), $imageName);
             $data['image'] = 'images/' . $imageName; // Simpan path relatif
         }
@@ -92,10 +92,10 @@ class ProductController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $data = $request->all();
+        $product->update($request->all());
 
         if ($request->hasFile('image')) {
-            $imageName = time().'.'.$request->image->extension();  
+            $imageName = time().'.'.$request->image->extension();
             $request->image->move(public_path('images'), $imageName);
             $data['image'] = 'images/' . $imageName; // Simpan path relatif
         }
@@ -119,6 +119,8 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Deleted From Product',
+        ], 200);
     }
 }
