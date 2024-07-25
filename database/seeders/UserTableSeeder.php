@@ -19,7 +19,7 @@ class UserTableSeeder extends Seeder
             'username' => 'admin',
             'email' => 'admin@gmail.com',
             'no_telp' => 'random',
-            'password' => bcrypt('admin'),
+            'password' => bcrypt('password'),
             'role' => 'admin'
         ]);
         $admin->assignRole('admin');

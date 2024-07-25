@@ -28,13 +28,20 @@ class Banner extends Model
 
     public function setStartDateAttribute($value)
     {
-        $this->attributes['start_date'] = Carbon::createFromFormat('Y-m-d', $value);
+        try {
+            $this->attributes['start_date'] = Carbon::createFromFormat('Y-m-d', $value);
+        } catch (\Exception $e) {
+            // Handle the exception, log it, or set a default value
+            $this->attributes['start_date'] = null; // or Carbon::now()->format('Y-m-d');
+        }
     }
 
     public function setEndDateAttribute($value)
     {
-        $this->attributes['end_date'] = Carbon::createFromFormat('Y-m-d', $value);
+        try {
+            $this->attributes['end_date'] = Carbon::createFromFormat('Y-m-d', $value);
+        } catch (\Exception $e) {
+            // Handle the exception, log it, or set a default value
+        }
     }
 }
-
-

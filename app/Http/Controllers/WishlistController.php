@@ -8,48 +8,72 @@ use App\Http\Resources\WishlistResource;
 
 class WishlistController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api'); // Pastikan middleware otentikasi digunakan
+    }
+
     public function index()
     {
-        $wishlists = Wishlist::all();
+        // Ambil semua wishlist yang terkait dengan pengguna yang sedang login
+        $wishlists = Wishlist::where('users_id', auth()->id())->get();
         return WishlistResource::collection($wishlists);
     }
 
     public function store(Request $request)
     {
+        // Validasi data yang diterima
         $validated = $request->validate([
-            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
         ]);
 
+        // Tambahkan users_id dari pengguna yang sedang login
+        $validated['users_id'] = auth()->id();
+
+        // Buat wishlist baru
         $wishlist = Wishlist::create($validated);
 
+        // Kembalikan response
         return new WishlistResource($wishlist);
     }
 
     public function show($id)
     {
-        $wishlist = Wishlist::findOrFail($id);
+        // Ambil wishlist berdasarkan id dan pengguna yang sedang login
+        $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
         return new WishlistResource($wishlist);
     }
 
     public function update(Request $request, $id)
     {
+        // Validasi data yang diterima
         $validated = $request->validate([
-            'users_id' => 'required|exists:users,id',
             'products_id' => 'required|exists:products,id',
         ]);
 
-        $wishlist = Wishlist::findOrFail($id);
+        // Tambahkan users_id dari pengguna yang sedang login
+        $validated['users_id'] = auth()->id();
+
+        // Ambil wishlist yang akan diupdate
+        $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
+
+        // Update wishlist
         $wishlist->update($validated);
 
+        // Kembalikan response
         return new WishlistResource($wishlist);
     }
 
     public function destroy($id)
     {
-        $wishlist = Wishlist::findOrFail($id);
+        // Ambil wishlist yang akan dihapus
+        $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
+
+        // Hapus wishlist
         $wishlist->delete();
 
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Deleted From Wishlist',
+        ], 200);
     }
 }

@@ -70,11 +70,13 @@ class MerchantController extends Controller
     {
         // Cari data merchant berdasarkan ID
         $merchant = Merchant::findOrFail($id);
-        
+
         // Hapus data merchant
         $merchant->delete();
 
         // Kembalikan respon tanpa konten
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Deleted From Merchant',
+        ], 200);
     }
 }

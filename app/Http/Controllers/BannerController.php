@@ -23,6 +23,8 @@ class BannerController extends Controller
         return response()->json(['message' => 'Banner not found'], 404);
     }
 
+    // mau coba push aja
+
     public function store(Request $request)
     {
         $validated = $request->validate([

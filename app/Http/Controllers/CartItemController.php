@@ -82,6 +82,8 @@ class CartItemController extends Controller
         $cartItem->delete();
 
         // Kembalikan response tanpa konten
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Deleted From Cart Item',
+        ], 200);
     }
 }
