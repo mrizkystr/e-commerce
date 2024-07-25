@@ -109,6 +109,8 @@ class OrderController extends Controller
         $order->delete();
 
         // Kembalikan response tanpa konten
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Deleted From Orders',
+        ], 200);
     }
 }
