@@ -7,9 +7,6 @@ use App\Models\CartItem;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Midtrans\Config;
-use Midtrans\Snap;
-use Midtrans\Notification;
 
 class OrderController extends Controller
 {
@@ -114,6 +111,7 @@ class OrderController extends Controller
         // Hapus order
         $order->delete();
 
+        // Kembalikan response tanpa konten
         return response()->noContent();
     }
 

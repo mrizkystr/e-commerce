@@ -56,7 +56,7 @@ class WishlistController extends Controller
 
         // Ambil wishlist yang akan diupdate
         $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
-        
+
         // Update wishlist
         $wishlist->update($validated);
 
@@ -68,11 +68,12 @@ class WishlistController extends Controller
     {
         // Ambil wishlist yang akan dihapus
         $wishlist = Wishlist::where('users_id', auth()->id())->findOrFail($id);
-        
+
         // Hapus wishlist
         $wishlist->delete();
 
-        // Kembalikan response tanpa konten
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Deleted From Wishlist',
+        ], 200);
     }
 }
