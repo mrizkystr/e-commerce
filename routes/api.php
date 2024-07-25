@@ -93,6 +93,6 @@ Route::prefix('wishlists')->group(function () {
 Route::prefix('profiles')->middleware('auth:api')->group(function () {
     Route::get('/', [ProfileController::class, 'show'])->name('profiles.show');
     Route::post('/store', [ProfileController::class, 'store'])->name('profiles.store');
-    Route::put('/{id}', [ProfileController::class, 'update'])->name('profiles.update');
+    Route::put('/update', [ProfileController::class, 'update'])->name('profiles.update');
     Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profiles.destroy');
 });

@@ -7,6 +7,7 @@ use App\Models\CartItem;
 use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -27,7 +28,6 @@ class OrderController extends Controller
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
-            'status' => 'in:pending,completed,canceled',
         ]);
 
         if ($validator->fails()) {
@@ -37,16 +37,16 @@ class OrderController extends Controller
         // Tambahkan users_id dari pengguna yang sedang login
         $orderData = $request->all();
         $orderData['users_id'] = auth()->id();
+        $orderData['status'] = 'pending'; // Set status default menjadi pending
 
         // Hitung total harga dari cart items yang terkait
         $cartItems = CartItem::where('users_id', auth()->id())->get();
         $totalPrice = 0;
+
         foreach ($cartItems as $cartItem) {
-            $price = $cartItem->product->price;
-            if (!is_numeric($price)) {
-                return response()->json(['error' => 'Non-numeric value encountered in product price.'], 400);
-            }
-            $totalPrice += $price;
+            $productPrice = (float) $cartItem->product->price;
+            Log::info("Product ID: {$cartItem->product->id}, Price: {$productPrice}");
+            $totalPrice += $productPrice;
         }
 
         // Tambahkan total_price ke order data
@@ -74,7 +74,6 @@ class OrderController extends Controller
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
-            'status' => 'in:pending,completed,canceled',
         ]);
 
         if ($validator->fails()) {
@@ -84,12 +83,17 @@ class OrderController extends Controller
         // Tambahkan users_id dari pengguna yang sedang login
         $orderData = $request->all();
         $orderData['users_id'] = auth()->id();
+        $orderData['status'] = 'pending'; // Set status default menjadi pending
 
         // Hitung ulang total harga dari cart items yang terkait
         $cartItems = CartItem::where('users_id', auth()->id())->get();
-        $totalPrice = $cartItems->sum(function ($cartItem) {
-            return $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
-        });
+        $totalPrice = 0;
+
+        foreach ($cartItems as $cartItem) {
+            $productPrice = (float) $cartItem->product->price;
+            Log::info("Product ID: {$cartItem->product->id}, Price: {$productPrice}");
+            $totalPrice += $productPrice;
+        }
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
