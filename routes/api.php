@@ -15,6 +15,8 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\UpdateTest;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -98,6 +100,6 @@ Route::prefix('wishlists')->group(function () {
 Route::prefix('profiles')->middleware('auth:api')->group(function () {
     Route::get('/{id}', [ProfileController::class, 'show'])->name('profiles.show');
     Route::post('/store', [ProfileController::class, 'store'])->name('profiles.store');
-    Route::put('/update', [ProfileController::class, 'update'])->name('profiles.update');
     Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profiles.destroy');
+    Route::post('/update/{id}', [ProfileController::class, 'update'])->name('profiles.update');
 });
