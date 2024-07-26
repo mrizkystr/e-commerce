@@ -83,7 +83,8 @@ class OrderController extends Controller
 
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
-            'cart_items_id' => 'required|exists:cart_items,id',
+            'cart_items_id' => 'required',
+            'cart_items_id.*' => 'exists:cart_items,id',
         ]);
 
         if ($validator->fails()) {
@@ -95,13 +96,14 @@ class OrderController extends Controller
         $orderData['users_id'] = auth()->id();
         $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Ambil cart item yang terkait
-        $cartItem = CartItem::where('id', $request->cart_items_id)
-            ->where('users_id', auth()->id())
-            ->firstOrFail();
-
-        // Hitung ulang total harga dari cart item yang terkait
-        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
+        // Hitung ulang total harga dari semua cart items yang terkait
+        $totalPrice = 0;
+        foreach ($request->cart_items_id as $cartItemId) {
+            $cartItem = CartItem::where('id', $cartItemId)
+                ->where('users_id', auth()->id())
+                ->firstOrFail();
+            $totalPrice += $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
+        }
 
         // Tambahkan total_price ke order data
         $orderData['total_price'] = $totalPrice;
@@ -151,19 +153,19 @@ class OrderController extends Controller
         ]);
     }
 
-
     public function handleNotification(Request $request)
     {
         $notification = new Notification();
 
-        $order = Order::findOrFail($notification->order_id);
+        $order = Order::where('id', explode('-', $notification->order_id)[0])->first();
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
+        // Perbarui status order berdasarkan notifikasi
         $order->update([
-            'transaction_status' => $notification->transaction_status,
+            'status' => $notification->transaction_status,
         ]);
 
         return response()->json(['message' => 'Notification handled successfully']);
