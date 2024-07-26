@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\OrderResource;
 use Illuminate\Support\Facades\Validator;
 
@@ -33,16 +34,18 @@ class OrderController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validasi data yang diterima
-        $validator = Validator::make($request->all(), [
-            'cart_items_id' => 'required|exists:cart_items,id',
-        ]);
+{
+    // Validasi data yang diterima
+    $validator = Validator::make($request->all(), [
+        'cart_items_id' => 'required|exists:cart_items,id',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
+    if ($validator->fails()) {
+        Log::error('Validation failed', $validator->errors()->toArray());
+        return response()->json($validator->errors(), 400);
+    }
 
+    try {
         // Ambil pengguna yang sedang login
         $user = auth()->user();
 
@@ -56,6 +59,12 @@ class OrderController extends Controller
             ->where('users_id', $user->id)
             ->firstOrFail();
 
+        // Check if product exists and has a price
+        if (!$cartItem->product || !$cartItem->product->price) {
+            Log::error('Product or price is missing', ['cart_item_id' => $request->cart_items_id]);
+            return response()->json(['error' => 'Product or price is missing'], 400);
+        }
+
         // Hitung total harga dari cart item yang terkait
         $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
@@ -66,7 +75,11 @@ class OrderController extends Controller
         $order = Order::create($orderData);
 
         return new OrderResource($order);
+    } catch (\Exception $e) {
+        Log::error('Error creating order', ['message' => $e->getMessage()]);
+        return response()->json(['error' => 'Internal Server Error'], 500);
     }
+}
 
 
     public function show($id)
