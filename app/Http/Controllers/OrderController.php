@@ -7,6 +7,7 @@ use Midtrans\Config;
 use App\Models\Order;
 use App\Models\CartItem;
 use Midtrans\Notification;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Resources\OrderResource;
 use Illuminate\Support\Facades\Validator;
@@ -42,14 +43,17 @@ class OrderController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
+        // Ambil pengguna yang sedang login
+        $user = auth()->user();
+
         // Tambahkan users_id dari pengguna yang sedang login
         $orderData = $request->all();
-        $orderData['users_id'] = auth()->id();
+        $orderData['users_id'] = $user->id;
         $orderData['status'] = 'pending'; // Set status default menjadi pending
 
         // Ambil cart item yang terkait
         $cartItem = CartItem::where('id', $request->cart_items_id)
-            ->where('users_id', auth()->id())
+            ->where('users_id', $user->id)
             ->firstOrFail();
 
         // Hitung total harga dari cart item yang terkait
@@ -63,6 +67,7 @@ class OrderController extends Controller
 
         return new OrderResource($order);
     }
+
 
     public function show($id)
     {
@@ -123,10 +128,13 @@ class OrderController extends Controller
         // Ambil order berdasarkan id dan pengguna yang sedang login
         $order = Order::where('users_id', auth()->id())->findOrFail($id);
 
+        // Generate unique order ID
+        $uniqueOrderId = $order->id . '-' . Str::uuid();
+
         // Buat transaksi Midtrans
         $params = [
             'transaction_details' => [
-                'order_id' => $order->id,
+                'order_id' => $uniqueOrderId,
                 'gross_amount' => $order->total_price,
             ],
             'customer_details' => [
@@ -142,6 +150,7 @@ class OrderController extends Controller
             'snap_token' => $snapToken,
         ]);
     }
+
 
     public function handleNotification(Request $request)
     {
