@@ -73,33 +73,16 @@ class ProfileController extends Controller
         $validatedData = $validator->validated();
         Log::info('Validated data: ', $validatedData);
 
-        $user->update([
+        // Hanya update field yang ada di input
+        $user->fill(array_filter([
             'username' => $request->username,
             'email' => $request->email,
             'no_telp' => $request->no_telp,
-            'password' => bcrypt($request->password),
-        ]);
+            'password' => $request->password ? bcrypt($request->password) : null,
+        ]));
 
-        // // Update user attributes jika ada
-        // if ($request->has('username')) {
-        //     $user->username = $request->input('username');
-        //     Log::info('Updated username: ' . $user->username);
-        // }
-        // if ($request->has('email')) {
-        //     $user->email = $request->input('email');
-        //     Log::info('Updated email: ' . $user->email);
-        // }
-        // if ($request->has('no_telp')) {
-        //     $user->no_telp = $request->input('no_telp');
-        //     Log::info('Updated no_telp: ' . $user->no_telp);
-        // }
-        // if ($request->has('password')) {
-        //     $user->password = bcrypt($request->input('password'));
-        //     Log::info('Updated password: ' . $user->password);
-        // }
-
-        // Simpan perubahan pada tabel users
-        // $userSaved = $user->save();
+        $userSaved = $user->isDirty() ? $user->save() : false;
+        Log::info('User updated: ', ['success' => $userSaved, 'data' => $user->toArray()]);
 
         // Update profile jika ada
         $profile = $user->profile;
@@ -125,19 +108,9 @@ class ProfileController extends Controller
                 Log::info('Profile created: ', ['success' => $profileSaved, 'data' => $profile->toArray()]);
             }
         }
-
-        // Mengembalikan data melalui resource
-        if($user){
-            Log::info('User saved: ', ['success' => $user, 'data' => $user->toArray()]);
-            return response()->json([$user], 200);
-        } else {
-            return response()->json(['message' => 'Gagal mengupdate'], 404);
-        }
+        
+        return new UserProfileResource($user);
     }
-
-
-
-
 
     public function destroy()
     {
