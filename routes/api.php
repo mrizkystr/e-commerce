@@ -15,6 +15,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\UpdateTest;
 
 /*
@@ -102,4 +103,12 @@ Route::prefix('profiles')->middleware('auth:api')->group(function () {
     Route::post('/store', [ProfileController::class, 'store'])->name('profiles.store');
     Route::delete('/delete', [ProfileController::class, 'destroy'])->name('profiles.destroy');
     Route::post('/update/{id}', [ProfileController::class, 'update'])->name('profiles.update');
+});
+
+Route::prefix('detail')->group(function () {
+    Route::get('/product', [DetailProductController::class, 'index']);
+    Route::get('/product/{id}', [DetailProductController::class, 'show']);
+    Route::post('/product', [DetailProductController::class, 'store']);
+    Route::put('/product/{id}', [DetailProductController::class, 'update']);
+    Route::delete('/product/{id}', [DetailProductController::class, 'destroy']);
 });
