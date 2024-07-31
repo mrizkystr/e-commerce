@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Resources\OrderResource;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,41 +32,58 @@ class OrderController extends Controller
         $orders = Order::where('users_id', auth()->id())->get();
         return OrderResource::collection($orders);
     }
-
     public function store(Request $request)
     {
+        // Log data request untuk debugging
+        Log::info('Request data:', $request->all());
+
         // Validasi data yang diterima
         $validator = Validator::make($request->all(), [
             'cart_items_id' => 'required|exists:cart_items,id',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Validation failed', $validator->errors()->toArray());
             return response()->json($validator->errors(), 400);
         }
 
-        // Ambil pengguna yang sedang login
-        $user = auth()->user();
+        // Periksa apakah cart_items_id adalah array dan ambil nilai pertama jika benar
+        $cartItemId = is_array($request->cart_items_id) ? $request->cart_items_id[0] : $request->cart_items_id;
 
-        // Tambahkan users_id dari pengguna yang sedang login
-        $orderData = $request->all();
-        $orderData['users_id'] = $user->id;
-        $orderData['status'] = 'pending'; // Set status default menjadi pending
+        try {
+            // Ambil pengguna yang sedang login
+            $user = auth()->user();
 
-        // Ambil cart item yang terkait
-        $cartItem = CartItem::where('id', $request->cart_items_id)
-            ->where('users_id', $user->id)
-            ->firstOrFail();
+            // Tambahkan users_id dari pengguna yang sedang login
+            $orderData = $request->all();
+            $orderData['users_id'] = $user->id;
+            $orderData['status'] = 'pending'; // Set status default menjadi pending
 
-        // Hitung total harga dari cart item yang terkait
-        $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
+            // Ambil cart item yang terkait
+            $cartItem = CartItem::where('id', $cartItemId)
+                ->where('users_id', $user->id)
+                ->firstOrFail();
 
-        // Tambahkan total_price ke order data
-        $orderData['total_price'] = $totalPrice;
+            // Check if product exists and has a price
+            if (!$cartItem->product || !$cartItem->product->price) {
+                Log::error('Product or price is missing', ['cart_item_id' => $cartItemId]);
+                return response()->json(['error' => 'Product or price is missing'], 400);
+            }
 
-        // Buat order baru
-        $order = Order::create($orderData);
+            // Hitung total harga dari cart item yang terkait
+            $totalPrice = $cartItem->product->price; // Asumsikan ada relasi product dan kolom price
 
-        return new OrderResource($order);
+            // Tambahkan total_price ke order data
+            $orderData['total_price'] = $totalPrice;
+
+            // Buat order baru
+            $order = Order::create($orderData);
+
+            return new OrderResource($order);
+        } catch (\Exception $e) {
+            Log::error('Error creating order', ['message' => $e->getMessage()]);
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
     }
 
 
