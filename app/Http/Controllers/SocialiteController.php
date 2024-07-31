@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Laravel\Socialite\Facades\Socialite;
+use Exception;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use Exception;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Session\Middleware\StartSession;
 
 class SocialiteController extends Controller
 {
@@ -51,6 +52,10 @@ class SocialiteController extends Controller
         }
     }
 
+    public function __construct()
+    {
+        $this->middleware(StartSession::class);
+    }
 
     public function refreshToken($refreshToken)
     {

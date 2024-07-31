@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
 use App\Models\User;
+use App\Models\Profile;
 use Illuminate\Http\Request;
-use App\Http\Resources\ProfileResource;
-use App\Http\Resources\UserProfileResource;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProfileResource;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserProfileResource;
 use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
@@ -47,41 +48,41 @@ class ProfileController extends Controller
     }
 
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
+        Log::info('Update method called for user ID: ' . $id);
+
+        // Cari user berdasarkan id yang diteruskan ke fungsi
+        $user = User::findOrFail($id);
+        Log::info('User before update: ', $user->toArray());
+
         // Validasi request
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'username' => 'nullable|string|max:255',
-            'email' => 'nullable|email|unique:users,email,' . Auth::id(),
+            'email' => 'nullable|email|unique:users,email,' . $id,
             'no_telp' => 'nullable|string|max:20',
             'password' => 'nullable|string|max:20',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Mendapatkan instance model Eloquent
-        $user = User::find(Auth::id());
-
-        // Cek jika user ada
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+        if ($validator->fails()) {
+            Log::error('Validation failed: ', $validator->errors()->toArray());
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Update user attributes jika ada
-        if ($request->has('username')) {
-            $user->username = $request->username;
-        }
-        if ($request->has('email')) {
-            $user->email = $request->email;
-        }
-        if ($request->has('no_telp')) {
-            $user->no_telp = $request->no_telp;
-        }
-        if ($request->has('password')) {
-            $user->password = bcrypt($request->password); // Hash password
-        }
+        $validatedData = $validator->validated();
+        Log::info('Validated data: ', $validatedData);
 
-        // Simpan perubahan pada tabel users
-        $user->save();
+        // Hanya update field yang ada di input
+        $user->fill(array_filter([
+            'username' => $request->username,
+            'email' => $request->email,
+            'no_telp' => $request->no_telp,
+            'password' => $request->password ? bcrypt($request->password) : null,
+        ]));
+
+        $userSaved = $user->isDirty() ? $user->save() : false;
+        Log::info('User updated: ', ['success' => $userSaved, 'data' => $user->toArray()]);
 
         // Update profile jika ada
         $profile = $user->profile;
@@ -90,10 +91,12 @@ class ProfileController extends Controller
                 // Hapus foto lama jika ada
                 if ($profile->photo) {
                     Storage::disk('public')->delete($profile->photo);
+                    Log::info('Old photo deleted: ' . $profile->photo);
                 }
                 // Simpan foto baru
                 $profile->photo = $request->file('photo')->store('profiles', 'public');
-                $profile->save(); // Simpan perubahan pada tabel profiles
+                $profileSaved = $profile->save();
+                Log::info('Profile updated: ', ['success' => $profileSaved, 'data' => $profile->toArray()]);
             }
         } else {
             // Jika profil belum ada, buat profil baru
@@ -101,11 +104,11 @@ class ProfileController extends Controller
                 $profile = new Profile();
                 $profile->user_id = $user->id;
                 $profile->photo = $request->file('photo')->store('profiles', 'public');
-                $profile->save(); // Simpan profil baru
+                $profileSaved = $profile->save();
+                Log::info('Profile created: ', ['success' => $profileSaved, 'data' => $profile->toArray()]);
             }
         }
-
-        // Mengembalikan data melalui resource
+        
         return new UserProfileResource($user);
     }
 

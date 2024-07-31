@@ -47,9 +47,6 @@ class OrderController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        // Periksa apakah cart_items_id adalah array dan ambil nilai pertama jika benar
-        $cartItemId = is_array($request->cart_items_id) ? $request->cart_items_id[0] : $request->cart_items_id;
-
         try {
             // Ambil pengguna yang sedang login
             $user = auth()->user();
@@ -60,13 +57,13 @@ class OrderController extends Controller
             $orderData['status'] = 'pending'; // Set status default menjadi pending
 
             // Ambil cart item yang terkait
-            $cartItem = CartItem::where('id', $cartItemId)
+            $cartItem = CartItem::where('id', $request->cart_items_id)
                 ->where('users_id', $user->id)
                 ->firstOrFail();
 
             // Check if product exists and has a price
             if (!$cartItem->product || !$cartItem->product->price) {
-                Log::error('Product or price is missing', ['cart_item_id' => $cartItemId]);
+                Log::error('Product or price is missing', ['cart_item_id' => $request->cart_items_id]);
                 return response()->json(['error' => 'Product or price is missing'], 400);
             }
 
@@ -84,6 +81,8 @@ class OrderController extends Controller
             Log::error('Error creating order', ['message' => $e->getMessage()]);
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
+
+        //Bejir Gabisa
     }
 
 
