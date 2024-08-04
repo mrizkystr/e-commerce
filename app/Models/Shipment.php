@@ -7,20 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Shipment extends Model
 {
     protected $fillable = [
-        'users_id', // Use 'users_id'
-        'address',
+        'users_id',
+        'province',
         'city',
-        'state',
+        'district',
+        'neighborhoods',
         'postal_code',
         'country',
         'status',
     ];
 
-    // If you have relationship defined
     public function user()
     {
-        return $this->belongsTo(User::class, 'users_id'); // Match column name
+        return $this->belongsTo(User::class, 'users_id');
     }
 }
-
-

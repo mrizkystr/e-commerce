@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Shipment;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Resources\ShipmentResource;
@@ -32,18 +31,20 @@ class ShipmentController extends Controller
         }
 
         $validatedData = $request->validate([
-            'address' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'neighborhoods' => 'required|string|max:255',
             'postal_code' => 'required|string|max:20',
             'country' => 'required|string|max:255',
         ]);
 
         $shipment = Shipment::create([
             'users_id' => $user->id,
-            'address' => $validatedData['address'],
+            'province' => $validatedData['province'],
             'city' => $validatedData['city'],
-            'state' => $validatedData['state'],
+            'district' => $validatedData['district'],
+            'neighborhoods' => $validatedData['neighborhoods'],
             'postal_code' => $validatedData['postal_code'],
             'country' => $validatedData['country'],
             'status' => 'pending',
@@ -51,7 +52,6 @@ class ShipmentController extends Controller
 
         return new ShipmentResource($shipment);
     }
-
 
     public function show($id)
     {
@@ -73,9 +73,10 @@ class ShipmentController extends Controller
         }
 
         $request->validate([
-            'address' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
             'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'neighborhoods' => 'required|string|max:255',
             'postal_code' => 'required|string|max:20',
             'country' => 'required|string|max:255',
         ]);
@@ -97,7 +98,6 @@ class ShipmentController extends Controller
 
         return response()->json(null, 204);
     }
-
 
     public function getProvinces()
     {
