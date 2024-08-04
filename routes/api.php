@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\UpdateTest;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use Laravel\Socialite\Facades\Socialite;
@@ -13,10 +14,10 @@ use App\Http\Controllers\CartItemController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\DetailProductController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\DetailProductController;
-use App\Http\Controllers\UpdateTest;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,4 +112,19 @@ Route::prefix('detail')->group(function () {
     Route::post('/product', [DetailProductController::class, 'store']);
     Route::put('/product/{id}', [DetailProductController::class, 'update']);
     Route::delete('/product/{id}', [DetailProductController::class, 'destroy']);
+});
+
+Route::prefix('shipments')->group(function () {
+    // Location endpoints
+    Route::get('/location/provinces', [ShipmentController::class, 'getProvinces']);
+    Route::get('/location/regencies/{provinceId}', [ShipmentController::class, 'getRegencies']);
+    Route::get('/location/districts/{regencyId}', [ShipmentController::class, 'getDistricts']);
+    Route::get('/location/villages/{districtId}', [ShipmentController::class, 'getVillages']);
+    
+    // Shipment endpoints
+    Route::get('/', [ShipmentController::class, 'index']);
+    Route::get('/{id}', [ShipmentController::class, 'show']);
+    Route::post('/store', [ShipmentController::class, 'store']);
+    Route::put('/{id}', [ShipmentController::class, 'update']);
+    Route::delete('/{id}', [ShipmentController::class, 'destroy']);
 });
