@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Shipment extends Model
 {
     protected $fillable = [
-        'users_id',
-        'province',
-        'city',
-        'district',
-        'neighborhoods',
+        'users_id', 
+        'province_id',
+        'city_id',
+        'district_id',
+        'village_id',
         'postal_code',
         'country',
         'status',

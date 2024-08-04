@@ -10,10 +10,10 @@ class CreateShipmentsTable extends Migration
     {
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
-            $table->string('province');
-            $table->string('city');
-            $table->string('district');
-            $table->string('neighborhoods');
+            $table->string('province_id');
+            $table->string('city_id');
+            $table->string('district_id');
+            $table->string('village_id');
             $table->string('postal_code');
             $table->string('country');
             $table->string('status')->default('pending');

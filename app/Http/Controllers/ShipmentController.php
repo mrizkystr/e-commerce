@@ -31,20 +31,20 @@ class ShipmentController extends Controller
         }
 
         $validatedData = $request->validate([
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'neighborhoods' => 'required|string|max:255',
+            'province_id' => 'required|integer',
+            'city_id' => 'required|integer',
+            'district_id' => 'required|integer',
+            'village_id' => 'required|integer',
             'postal_code' => 'required|string|max:20',
             'country' => 'required|string|max:255',
         ]);
 
         $shipment = Shipment::create([
             'users_id' => $user->id,
-            'province' => $validatedData['province'],
-            'city' => $validatedData['city'],
-            'district' => $validatedData['district'],
-            'neighborhoods' => $validatedData['neighborhoods'],
+            'province_id' => $validatedData['province_id'],
+            'city_id' => $validatedData['city_id'],
+            'district_id' => $validatedData['district_id'],
+            'village_id' => $validatedData['village_id'],
             'postal_code' => $validatedData['postal_code'],
             'country' => $validatedData['country'],
             'status' => 'pending',
@@ -73,10 +73,10 @@ class ShipmentController extends Controller
         }
 
         $request->validate([
-            'province' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'neighborhoods' => 'required|string|max:255',
+            'province_id' => 'required|integer',
+            'city_id' => 'required|integer',
+            'district_id' => 'required|integer',
+            'village_id' => 'required|integer',
             'postal_code' => 'required|string|max:20',
             'country' => 'required|string|max:255',
         ]);
